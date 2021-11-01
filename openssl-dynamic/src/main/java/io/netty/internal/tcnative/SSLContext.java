@@ -649,6 +649,51 @@ public final class SSLContext {
     public static native void setUseTasks(long ctx, boolean useTasks);
 
     /**
+     * Adds a TLS certificate compression algorithm to the given {@link SSLContext} or throws an
+     * exception if TLS certificate compression is not supported or the algorithm not recognized.
+     * For servers, algorithm preference order is dictated by the order of algorithm registration.
+     * Most preferred algorithm should be registered first.
+     *
+     * Only supported by BoringSSL.
+     *
+     * <a href="https://commondatastorage.googleapis.com/chromium-boringssl-docs/ssl.h.html#Certificate-compression">
+     *     SSL_CTX_add_cert_compression_alg</a>
+     * <a href="https://www.ietf.org/rfc/rfc8879.txt">rfc8879</a>
+     *
+     * @param ctx context, to which, the algorithm should be added.
+     * @param algorithm compression algorithm which should be added. Options defined in
+     * <a href="https://datatracker.ietf.org/doc/html/rfc8879#section-3">RFC8879 Section 3</a>
+     * <PRE>
+     * {@link SSL#TLS_EXT_CERT_COMPRESSION_ZLIB}
+     * {@link SSL#TLS_EXT_CERT_COMPRESSION_BROTLI}
+     * {@link SSL#TLS_EXT_CERT_COMPRESSION_ZSTD}
+     * </PRE>
+     * @return 1 for success, 0 for failure.
+     */
+    public static native int addTlsCertCompressionAlgorithm(long ctx, int algorithm);
+
+    /**
+     * Tries to dynamically load native libraries which provide support for the requested algorithm.
+     * If successful, and the algorithm is available, returns True. Otherwise, returns False.
+     *
+     * Only supported by BoringSSL.
+     *
+     * <a href="https://commondatastorage.googleapis.com/chromium-boringssl-docs/ssl.h.html#Certificate-compression">
+     *     SSL_CTX_add_cert_compression_alg</a>
+     * <a href="https://www.ietf.org/rfc/rfc8879.txt">rfc8879</a>
+     *
+     * @param algorithm compression algorithm which should be evaluated. Options defined in
+     * <a href="https://datatracker.ietf.org/doc/html/rfc8879#section-3">RFC8879 Section 3</a>
+     * <PRE>
+     * {@link SSL#TLS_EXT_CERT_COMPRESSION_ZLIB}
+     * {@link SSL#TLS_EXT_CERT_COMPRESSION_BROTLI}
+     * {@link SSL#TLS_EXT_CERT_COMPRESSION_ZSTD}
+     * </PRE>
+     * @return True if algorithm is available. False otherwise.
+     */
+    public static native boolean checkAvailableTlsCertCompressionAlgorithm(int algorithm);
+
+    /**
      * Set the {@link SSLPrivateKeyMethod} to use for the given {@link SSLContext}.
      * This allows to offload private key operations
      * if needed.

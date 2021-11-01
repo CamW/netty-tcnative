@@ -56,8 +56,8 @@
     <linkStatic>true</linkStatic>
     <compileLibrary>true</compileLibrary>
     <msvcSslIncludeDirs>${boringsslSourceDir}/include</msvcSslIncludeDirs>
-    <msvcSslLibDirs>${boringsslHome}/ssl;${boringsslHome}/crypto</msvcSslLibDirs>
-    <msvcSslLibs>ssl.lib;crypto.lib</msvcSslLibs>
+    <msvcSslLibDirs>${boringsslHome}/ssl;${boringsslHome}/crypto;</msvcSslLibDirs>
+    <msvcSslLibs>ssl.lib;crypto.lib;</msvcSslLibs>
     <cflags>-Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value -O3</cflags>
     <cppflags>-DHAVE_OPENSSL -I${boringsslSourceDir}/include</cppflags>
     <ldflags>-L${boringsslHome}/ssl -L${boringsslHome}/crypto -lssl -lcrypto</ldflags>
@@ -242,6 +242,8 @@
                 </configuration>
               </execution>
 
+
+
               <!-- Build the additional JAR that contains the native library. -->
               <execution>
                 <id>native-jar</id>
@@ -275,7 +277,7 @@
                       <zipfileset dir="${nativeLibOnlyDir}/META-INF/native" />
                       <regexpmapper handledirsep="yes" from="^(?:[^/]+/)*([^/]+)$" to="META-INF/native/\1" />
                     </copy>
-                    
+
                     <!-- linux / osx -->
                     <move todir="${nativeJarWorkdir}/META-INF/native/" flatten="true">
                       <fileset dir="${nativeJarWorkdir}/META-INF/native/" />
@@ -328,6 +330,7 @@
                   <forceAutogen>${forceAutogen}</forceAutogen>
                   <forceConfigure>${forceConfigure}</forceConfigure>
                   <windowsBuildTool>msbuild</windowsBuildTool>
+                  <verbose>true</verbose>
                   <!-- <verbose>true</verbose> -->
                   <configureArgs>
                     <configureArg>--with-ssl=no</configureArg>
@@ -670,7 +673,7 @@
                     <configureArg>--libdir=${project.build.directory}/native-build/target/lib</configureArg>
                     <configureArg>CFLAGS=-O3 -Werror -fno-omit-frame-pointer -fvisibility=hidden -Wunused -Wno-unused-value</configureArg>
                     <configureArg>CPPFLAGS=-DHAVE_OPENSSL -I${boringsslSourceDir}/include</configureArg>
-                    <configureArg>LDFLAGS=-L${boringsslHome}/ssl -L${boringsslHome}/crypto -lssl -lcrypto</configureArg>
+                    <configureArg>LDFLAGS=-L${boringsslHome}/ssl -L${boringsslHome}/crypto</configureArg>
                     <configureArg>--host=aarch64-linux-gnu</configureArg>
                     <configureArg>CC=aarch64-none-linux-gnu-gcc</configureArg>
                   </configureArgs>

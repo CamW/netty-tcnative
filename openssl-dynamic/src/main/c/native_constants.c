@@ -17,6 +17,7 @@
 #include "tcn.h"
 #include "ssl_private.h"
 #include "native_constants.h"
+#include "cert_compress.h"
 
 #define NATIVE_CONSTANTS_CLASSNAME "io/netty/internal/tcnative/NativeStaticallyReferencedJniMethods"
 
@@ -600,6 +601,18 @@ TCN_IMPLEMENT_CALL(jint, NativeStaticallyReferencedJniMethods, sslRenegotiateExp
 #endif
 }
 
+TCN_IMPLEMENT_CALL(jint, NativeStaticallyReferencedJniMethods, tlsExtCertCompressionZlib)(TCN_STDARGS) {
+    return TLSEXT_cert_compression_zlib;
+}
+
+TCN_IMPLEMENT_CALL(jint, NativeStaticallyReferencedJniMethods, tlsExtCertCompressionBrotli)(TCN_STDARGS) {
+    return TLSEXT_cert_compression_brotli;
+}
+
+TCN_IMPLEMENT_CALL(jint, NativeStaticallyReferencedJniMethods, tlsExtCertCompressionZstd)(TCN_STDARGS) {
+    return TLSEXT_cert_compression_zstd;
+}
+
 // JNI Method Registration Table Begin
 static const JNINativeMethod method_table[] = {
   { TCN_METHOD_TABLE_ENTRY(sslOpCipherServerPreference, ()I, NativeStaticallyReferencedJniMethods) },
@@ -725,8 +738,10 @@ static const JNINativeMethod method_table[] = {
   { TCN_METHOD_TABLE_ENTRY(sslRenegotiateOnce, ()I, NativeStaticallyReferencedJniMethods) },
   { TCN_METHOD_TABLE_ENTRY(sslRenegotiateFreely, ()I, NativeStaticallyReferencedJniMethods) },
   { TCN_METHOD_TABLE_ENTRY(sslRenegotiateIgnore, ()I, NativeStaticallyReferencedJniMethods) },
-  { TCN_METHOD_TABLE_ENTRY(sslRenegotiateExplicit, ()I, NativeStaticallyReferencedJniMethods) }
-
+  { TCN_METHOD_TABLE_ENTRY(sslRenegotiateExplicit, ()I, NativeStaticallyReferencedJniMethods) },
+  { TCN_METHOD_TABLE_ENTRY(tlsExtCertCompressionZlib, ()I, NativeStaticallyReferencedJniMethods) },
+  { TCN_METHOD_TABLE_ENTRY(tlsExtCertCompressionBrotli, ()I, NativeStaticallyReferencedJniMethods) },
+  { TCN_METHOD_TABLE_ENTRY(tlsExtCertCompressionZstd, ()I, NativeStaticallyReferencedJniMethods) }
 };
 
 static const jint method_table_size = sizeof(method_table) / sizeof(method_table[0]);

@@ -267,6 +267,21 @@ extern void *SSL_temp_keys[SSL_TMP_KEY_MAX];
 #define SSL_ERROR_WANT_CERTIFICATE_VERIFY       -1
 #endif
 
+#ifndef TLSEXT_cert_compression_zlib
+// See https://datatracker.ietf.org/doc/html/rfc8879#section-3
+#define TLSEXT_cert_compression_zlib            1
+#endif
+
+#ifndef TLSEXT_cert_compression_brotli
+// See https://datatracker.ietf.org/doc/html/rfc8879#section-3
+#define TLSEXT_cert_compression_brotli          2
+#endif
+
+#ifndef TLSEXT_cert_compression_zstd
+// See https://datatracker.ietf.org/doc/html/rfc8879#section-3
+#define TLSEXT_cert_compression_zstd            3
+#endif
+
 typedef struct tcn_ssl_ctxt_t tcn_ssl_ctxt_t;
 
 typedef struct {

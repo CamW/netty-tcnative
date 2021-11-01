@@ -37,6 +37,7 @@
 #include "ssl_private.h"
 #include <stdint.h>
 #include "sslcontext.h"
+#include "cert_compress.h"
 
 #define SSLCONTEXT_CLASSNAME "io/netty/internal/tcnative/SSLContext"
 
@@ -166,6 +167,8 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jint protocol, jint mod
     //
     // See https://github.com/google/boringssl/blob/chromium-stable/PORTING.md#crypto_buffer
     ctx = SSL_CTX_new(TLS_with_buffers_method());
+
+    SSL_CTX_add_cert_compression_alg(ctx, TLSEXT_cert_compression_brotli, brotli_compress, brotli_decompress);
 
     // Needed in BoringSSL to be able to use TLSv1.3
     //
@@ -919,6 +922,8 @@ cleanup:
     return rv;
 #endif // OPENSSL_IS_BORINGSSL
 }
+
+
 
 TCN_IMPLEMENT_CALL(void, SSLContext, setNpnProtos0)(TCN_STDARGS, jlong ctx, jbyteArray next_protos,
         jint selectorFailureBehavior)
@@ -2647,6 +2652,58 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCurvesList0)(TCN_STDARGS, jlong ctx,
     return ret == 1 ? JNI_TRUE : JNI_FALSE;
 }
 
+TCN_IMPLEMENT_CALL(jint, SSLContext, addTlsCertCompressionAlgorithm)(TCN_STDARGS, jlong ctx, jint algorithm) {
+#ifdef OPENSSL_IS_BORINGSSL
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    TCN_CHECK_NULL(c, ctx, 0);
+    switch (algorithm) {
+        case TLSEXT_cert_compression_zlib:
+            if (!zlib_load_libs()) {
+                tcn_ThrowException(e, "Could not load one or more shared libraries for Zlib certificate compression.");
+                return 0;
+            }
+            return SSL_CTX_add_cert_compression_alg(c->ctx, algorithm, zlib_compress, zlib_decompress);
+        case TLSEXT_cert_compression_brotli:
+            if (!brotli_load_libs()) {
+                tcn_ThrowException(e, "Could not load one or more shared libraries for Brotli certificate compression.");
+                return 0;
+            }
+            return SSL_CTX_add_cert_compression_alg(c->ctx, algorithm, brotli_compress, brotli_decompress);
+        case TLSEXT_cert_compression_zstd:
+            if (!zstd_load_libs()) {
+                tcn_ThrowException(e, "Could not load one or more shared libraries for Zstd certificate compression.");
+                return 0;
+            }
+            return SSL_CTX_add_cert_compression_alg(c->ctx, algorithm, zstd_compress, zstd_decompress);
+        default:
+            tcn_ThrowException(e, "Unrecognized certificate compression algorithm");
+            return 0;
+    }
+#else
+    tcn_Throw(e, "TLS Cert Compression only supported by BoringSSL");
+    return 0;
+#endif // OPENSSL_IS_BORINGSSL
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, checkAvailableTlsCertCompressionAlgorithm)(TCN_STDARGS, jint algorithm) {
+#ifdef OPENSSL_IS_BORINGSSL
+    switch (algorithm) {
+        case TLSEXT_cert_compression_zlib:
+            return zlib_load_libs() ? JNI_TRUE : JNI_FALSE;
+        case TLSEXT_cert_compression_brotli:
+            return brotli_load_libs() ? JNI_TRUE : JNI_FALSE;
+        case TLSEXT_cert_compression_zstd:
+            return zstd_load_libs() ? JNI_TRUE : JNI_FALSE;
+        default:
+            // Unrecognized certificate compression algorithm
+            return JNI_FALSE;
+    }
+#else
+    // TLS Cert Compression only supported by BoringSSL
+    return 0;
+#endif // OPENSSL_IS_BORINGSSL
+}
+
 // JNI Method Registration Table Begin
 static const JNINativeMethod fixed_method_table[] = {
   { TCN_METHOD_TABLE_ENTRY(make, (II)J, SSLContext) },
@@ -2704,7 +2761,9 @@ static const JNINativeMethod fixed_method_table[] = {
   { TCN_METHOD_TABLE_ENTRY(getSslCtx, (J)J, SSLContext) },
   { TCN_METHOD_TABLE_ENTRY(setUseTasks, (JZ)V, SSLContext) },
   { TCN_METHOD_TABLE_ENTRY(setNumTickets, (JI)Z, SSLContext) },
-  { TCN_METHOD_TABLE_ENTRY(setCurvesList0, (JLjava/lang/String;)Z, SSLContext) }
+  { TCN_METHOD_TABLE_ENTRY(setCurvesList0, (JLjava/lang/String;)Z, SSLContext) },
+  { TCN_METHOD_TABLE_ENTRY(addTlsCertCompressionAlgorithm, (JI)I, SSLContext) },
+  { TCN_METHOD_TABLE_ENTRY(checkAvailableTlsCertCompressionAlgorithm, (I)Z, SSLContext) }
 };
 
 static const jint fixed_method_table_size = sizeof(fixed_method_table) / sizeof(fixed_method_table[0]);

@@ -172,4 +172,7 @@ final class NativeStaticallyReferencedJniMethods {
     static native int sslRenegotiateFreely();
     static native int sslRenegotiateIgnore();
     static native int sslRenegotiateExplicit();
+    static native int tlsExtCertCompressionZlib();
+    static native int tlsExtCertCompressionBrotli();
+    static native int tlsExtCertCompressionZstd();
 }

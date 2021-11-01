@@ -116,6 +116,11 @@ public final class SSL {
     public static final int SSL_RENEGOTIATE_IGNORE = sslRenegotiateIgnore();
     public static final int SSL_RENEGOTIATE_EXPLICIT = sslRenegotiateExplicit();
 
+    // Tls certificate compression algorithms.
+    public static final int TLS_EXT_CERT_COMPRESSION_ZLIB   = tlsExtCertCompressionZlib();
+    public static final int TLS_EXT_CERT_COMPRESSION_BROTLI = tlsExtCertCompressionBrotli();
+    public static final int TLS_EXT_CERT_COMPRESSION_ZSTD   = tlsExtCertCompressionZstd();
+
     /* Return OpenSSL version number */
     public static native int version();
 
